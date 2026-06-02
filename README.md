@@ -1,7 +1,5 @@
 # User Service
 
-# User Service
-
 ## Description
 
 The User Service is one of 3 microservices for the Ada Developers Academy Cloud Curriculum e-commerce application. It handles the creation and management of user accounts in the e-commerce system.
@@ -92,3 +90,4 @@ python -m app.consumers.consumer
 ```bash
 pytest
 ```
+
