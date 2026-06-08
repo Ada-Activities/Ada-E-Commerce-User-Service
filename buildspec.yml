@@ -29,6 +29,7 @@ phases:
     
   post_build:
     commands:
+      - docker stop test-db && docker rm test-db
       - echo Pushing the Docker images...
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - docker push $REPOSITORY_URI:latest
