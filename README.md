@@ -91,3 +91,4 @@ python -m app.consumers.consumer
 pytest
 ```
 
+Line added for pipeline testing
