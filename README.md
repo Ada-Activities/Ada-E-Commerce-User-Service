@@ -90,5 +90,3 @@ python -m app.consumers.consumer
 ```bash
 pytest
 ```
-
-Line added for pipeline testing
