@@ -1,20 +1,44 @@
 from flask import Flask
 from flask_cors import CORS
+from sqlalchemy.engine import URL
 from .db import db, migrate
 from .models.user import User
 from .routes.user_routes import bp as users_bp 
 
 import os
+import boto3
+import json
+
 
 def create_app(config=None):
     app = Flask(__name__)
     CORS(app)
 
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
-
     if config:
         app.config.update(config)
+    
+    else:
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+        DB_HOST = os.environ.get('DATABASE_HOST')
+        DB_PORT = int(os.environ.get('DATABASE_PORT', 5432))
+        DB_NAME = os.environ.get('DATABASE_NAME')
+        DB_USER = os.environ.get('DATABASE_USER')
+
+
+        secrets_client = boto3.client('secretsmanager')
+        secret = secrets_client.get_secret_value(SecretId=os.environ.get('DATABASE_SECRET_ARN'))
+        DB_PASSWORD = json.loads(secret['SecretString'])['password']
+
+        connection_url = URL.create(
+            drivername='postgresql+psycopg2',
+            username=DB_USER,
+            password=DB_PASSWORD,
+            host=DB_HOST,
+            port=DB_PORT,
+            database=DB_NAME
+        )
+        app.config['SQLALCHEMY_DATABASE_URI'] = connection_url
+
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -24,7 +48,7 @@ def create_app(config=None):
     @app.get('/')
     def index():
         return {
-        "status": "ok"
+            "status": "ok"
         }
 
     return app
